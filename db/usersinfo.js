@@ -46,6 +46,11 @@ const stuSchema=new Schema({
         type:String,    
         default:'avatar/default.jpg'
     },
+    uwantlist:{
+    type:Array,
+    default:[]
+    },
+    
     udate: { type: Date, default:moment().format("YYYY-MM-DD hh:mm:ss")},
 })
 var userModel=mongoose.model('users',stuSchema)

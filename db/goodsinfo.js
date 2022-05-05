@@ -59,7 +59,6 @@ const goodsSchema = new Schema({
     greply: {
         type: Array,
         default: []
-
     }
 
 })
