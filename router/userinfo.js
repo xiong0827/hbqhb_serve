@@ -16,4 +16,5 @@ router.post('/register',expressjoi(reg_userinfo_schema),user_handler.registerUse
 router.post('/getcode',expressjoi(reg_phonecode_schema),user_handler.getcode)
 //登录
 router.post('/loginuser',expressjoi(reg_login_schema),user_handler.loginUser)
+
 module.exports=router

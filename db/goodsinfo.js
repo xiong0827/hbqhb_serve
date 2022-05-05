@@ -1,6 +1,8 @@
 require('./mongooseServer')
 const mongoose = require('mongoose')
 const moment = require('moment');
+const { object, number } = require('joi');
+const { Int32 } = require('mongodb');
 var Schema = mongoose.Schema;
 const goodsSchema = new Schema({
     goods_id: {
@@ -34,9 +36,21 @@ const goodsSchema = new Schema({
         max: 999,
 
     },
-    phone_id: {
-        type: String,
-        match: /^(13[0-9]|14[5|7]|19[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9]|16[0|1|2|3|5|6|7|8|9]|19[0|1|2|3|5|6|7|8|9])\d{8}$/
+    issueper:{
+        type:Object,
+        default:[]
+    },
+    likes:{
+        type:Number,
+        default:0
+    },
+    wantlist:{
+       type:[],
+       default:[]
+    },
+    phone_id:{
+       type:String,
+       match:/^(13[0-9]|14[5|7]|19[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9]|16[0|1|2|3|5|6|7|8|9]|19[0|1|2|3|5|6|7|8|9])\d{8}$/
     },
     gdate: {
         type: Date,
