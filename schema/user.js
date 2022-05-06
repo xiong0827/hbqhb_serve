@@ -25,6 +25,22 @@ exports.reg_userinfo_schema = {
        
         }
     }
+    //修改密码
+exports.reg_updatepassword_schema={
+    body:{
+        password
+    }
+}
+//修改个人信息
+exports.reg_updateuserinfo_schema={
+    body:{
+        nickname:joi.string().min(3).max(10),
+        address:joi.string().trim(),
+        gender:joi.string().trim(),
+        avatar:joi.string().trim(),
+        birthday:joi.string().trim()
+    }
+}
 exports.update_userinfo_schema = {
     body: {
         id,

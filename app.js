@@ -43,6 +43,12 @@ app.use('/api', userRouter)
 //商品模块路由
 const goodsRouter=require('./router/goodsinfo')
 app.use('/commodity',goodsRouter)
+//修改个人信息
+const setuserRouter=require('./router/setuserinfo')
+app.use('/user',setuserRouter)
+//订单 
+const orderRouter=require('./router/order')
+app.use('/order',orderRouter)
 //错误中间件
 app.use((err, req, res, next) => {
     console.log(err.name);

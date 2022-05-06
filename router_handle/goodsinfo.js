@@ -8,9 +8,11 @@ const userModel = require('../db/usersinfo')
 const moment = require('moment');
 //解析token
 const jwt = require('jsonwebtoken');
+//给回复分配id
+const {
+    nanoid
+} = require('nanoid')
 
-const req = require('express/lib/request');
-const res = require('express/lib/response');
 // uuidv4(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
 exports.issueGoods = (req, res) => {
     const goodsinfo = req.body
@@ -238,26 +240,13 @@ exports.getUserLike = (req, res) => {
     //     phone_id
     // } = jwt.decode(usertoken)
     let goodsInfo = req.query
-    // goodsModel.updateOne({
-    //     goods_id: goodsInfo.goods_id
-    // }, {
-    //     $inc: {
-    //         likes: 1
-    //     }
-    // }, function (err) {
-    //     if (!err) {
-    //         res.cc('点赞成功', 200)
-    //     } else {
-    //         res.cc('点赞失败', 301)
-    //     }
-    // })
     goodsModel.findOne({
         goods_id: goodsInfo.goods_id
     }, {
         likes: 1,
         title: 1
     }).then(docs => {
-        console.log(docs);
+
         if (docs) {
             docs.likes++;
             docs.save((err) => {
@@ -268,9 +257,8 @@ exports.getUserLike = (req, res) => {
                     res.cc('点赞成功', 200)
                 }
             })
-        }
-        else{
-            res.cc('没有找到',401)
+        } else {
+            res.cc('没有找到', 401)
         }
     }).catch(err => {
         if (err) {
@@ -281,16 +269,21 @@ exports.getUserLike = (req, res) => {
 //获取商品详情
 exports.getGoodsInfo = (req, res) => {
     let goodsinfo = req.query;
+    let iusertoken = jwt.decode(req.headers.authorization.slice(7));
     goodsModel.findOne({
         goods_id: goodsinfo.goods_id
     }, function (err, docs) {
         if (err) {
             res.cc('查看详情错误', 301)
         } else if (docs) {
+
             res.send({
                 status: 200,
                 message: 200,
-                tgoodsinfo: docs
+                tgoodsinfo: docs,
+                isbuy: iusertoken.phone_id == docs.phone_id ? 0 : 1,
+                //为-1时显示红色
+                wantshow: docs.wantlist.findIndex(element => element.phone_id == iusertoken.phone_id)
             })
         } else {
             res.cc(err, 402)
@@ -324,16 +317,16 @@ exports.addWantList = (req, res) => {
                             gprice: docs.gprice,
                             issueper: docs.issueper,
                             collectiontime: moment().format("YYYY-MM-DD hh:mm:ss")
-                            
+
                         })
-                        udocs.save((err)=>{
+                        udocs.save((err) => {
                             if (err) {
                                 res.cc('收藏失败', 300)
                             }
                         })
                     } else {
                         udocs.uwantlist.splice(iswant, 1)
-                        udocs.save((err)=>{
+                        udocs.save((err) => {
                             if (err) {
                                 res.cc('收藏失败', 300)
                             }
@@ -354,9 +347,12 @@ exports.addWantList = (req, res) => {
                 })
                 docs.save((err) => {
                     if (!err) {
-                        res.cc('收藏成功', 200)
-                    }
-                    else{
+                        res.send({
+                            status: 200,
+                            message: '收藏成功',
+                            wantstatus: 1
+                        })
+                    } else {
                         res.cc('保存失败')
                     }
                 })
@@ -364,7 +360,11 @@ exports.addWantList = (req, res) => {
                 docs.wantlist.splice(iswant, 1)
                 docs.save((err) => {
                     if (!err) {
-                        res.cc('取消收藏', 200)
+                        res.send({
+                            status: 200,
+                            message: '取消收藏',
+                            wantstatus: 0
+                        })
                     }
                 })
             }
@@ -373,3 +373,65 @@ exports.addWantList = (req, res) => {
         }
     })
 }
+//回复商品
+exports.replyGoods = (req, res) => {
+    let usertoken = jwt.decode(req.headers.authorization.slice(7));
+    let replytitle = req.body.replytitle
+    const replyinfo = req.query
+    goodsModel.findOne({
+        goods_id: replyinfo.goods_id
+    }, {}).then((docs) => {
+        //向评论数组中添加的值
+
+        if (replyinfo.reply_id) {
+            //二级评论
+            let replyindex = docs.greply.findIndex(element => element.reply_id == replyinfo.reply_id)
+            docs.greply[replyindex].children.push({
+                reply_id: nanoid(),
+                phone_id: usertoken.phone_id,
+                nickname: usertoken.nickname,
+                avatarurl: usertoken.avatarurl,
+                replytitle,
+                isauthor: usertoken.phone_id == docs.greply[replyindex].phone_id ? 1 : 0,
+                children: [
+
+                ]
+            })
+
+            docs.save((err) => {
+                if (err) {
+                    res.cc('评论失败' + null, 301)
+                } else {
+                    res.send({
+                        status: 200,
+                        message: '二级评论成功',
+                    })
+                }
+            })
+        } else {
+            docs.greply.push({
+                reply_id: nanoid(),
+                phone_id: usertoken.phone_id,
+                nickname: usertoken.nickname,
+                avatarurl: usertoken.avatarurl,
+                replytitle,
+                isauthor: usertoken.phone_id == docs.phone_id ? 1 : 0,
+                children: [
+
+                ]
+            })
+            docs.save((err) => {
+                if (err) {
+                    res.cc('评论失败' + null, 301)
+                } else {
+                    res.send({
+                        status: 200,
+                        message: '评论成功',
+
+                    })
+                }
+            })
+        }
+    })
+}
+

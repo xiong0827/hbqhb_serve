@@ -29,3 +29,12 @@ exports.reg_showgoods_schema = {
         searchkeyword: joi.string().trim().max(12)
     }
 }
+exports.reg_goodsid_schema={
+    query:{
+        goods_id:joi.string().trim().required(),
+        reply_id:joi.string().trim()
+    },
+    body:{
+        replytitle:joi.string().trim().min(1).max(30)
+    }
+}
