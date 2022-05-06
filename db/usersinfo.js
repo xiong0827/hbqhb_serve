@@ -44,7 +44,7 @@ const stuSchema = new Schema({
     },
     avatarurl: {
         type: String,
-        default: 'avatar/default.jpg'
+        default: 'http://101.43.12.130:3000/uploads/avatarurl/default.jpg'
     },
     uwantlist: {
         type: Array,

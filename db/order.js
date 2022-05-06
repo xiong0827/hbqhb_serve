@@ -20,7 +20,9 @@ ordertime:{
 },
 orderstatus:{
     type:Number,
+    //订单取消
     min: -1,
+    //订单完成
     max: 1, 
     default: 0
 },
@@ -30,6 +32,10 @@ buserinfo:{
 orderAddress:{
     type:Object,
     default:{}
+},
+issueper:{
+type:Object,
+
 }
 })
 var orderModel = mongoose.model('orders', orderSchema)
