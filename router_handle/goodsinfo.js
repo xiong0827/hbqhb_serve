@@ -43,12 +43,15 @@ exports.issueGoods = (req, res) => {
         details: goodsinfo.details,
         gclassone: goodsinfo.gclassone,
         gprice: goodsinfo.gprice,
-        issueper: usertoken,
         phone_id: usertoken.phone_id,
         goodsphoto: goodsphoto
     }, function (err, docs) {
         if (!err) {
-            res.cc('添加商品成功', 200, docs)
+            res.send({
+                status:200,
+                message:'发布商品成功',
+                goods_id:docs.goods_id
+            })
         } else {
             res.cc(err, 301)
         }
@@ -179,7 +182,7 @@ exports.getgoodsLits = (req, res) => {
                 res.cc('没有找到该商品', 201)
             } else {
                 showcount = docs
-                goodsModel.find(filters, '-_id gprice gstatus title gclassone details likes wantlist issueper ', {
+                goodsModel.find(filters, ' goods_id gprice gstatus title gclassone details likes wantlist issueper goodsphoto ', {
                     skip: (paginginfo.atpage - 1) * (paginginfo.pagenum),
                     limit: paginginfo.pagenum,
                     sort: goodssort
@@ -191,7 +194,7 @@ exports.getgoodsLits = (req, res) => {
                             res.send({
                                 status: 200,
                                 message: '获取成功',
-                                goodsList: docs,
+                                goodsList:docs,
                                 goodscount: showcount
                             })
                         } else {
@@ -210,16 +213,12 @@ exports.getgoodsLits = (req, res) => {
 }
 //获取个人发布商品
 exports.getMainGoodsList = (req, res) => {
-    let usertoken = req.headers.authorization.slice(7);
-    const {
-        phone_id
-    } = jwt.decode(usertoken)
-    if (!phone_id) {
+   let phone_id = req.query.phone_id?req.query.phone_id:jwt.decode(req.headers.authorization.slice(7)).phone_id;
+    if (!jwt.decode(req.headers.authorization.slice(7)).phone_id) {
         res.cc('清先登录', 301)
     } else {
         goodsModel.find({
-            'phone_id': phone_id
-
+             phone_id
         }, function (err, docs) {
             if (err) {
                 res.cc('获取个人信息失败')
@@ -279,7 +278,8 @@ exports.getGoodsInfo = (req, res) => {
 
             res.send({
                 status: 200,
-                message: 200,
+                message: '获取商品详情成功',
+                seeuserinfo:iusertoken,
                 tgoodsinfo: docs,
                 isbuy: iusertoken.phone_id == docs.phone_id ? 0 : 1,
                 //为-1时显示红色
@@ -315,6 +315,7 @@ exports.addWantList = (req, res) => {
                             gstatus: docs.gstatus,
                             goodsphoto: docs.goodsphoto,
                             gprice: docs.gprice,
+                            title:docs.title,
                             issueper: docs.issueper,
                             collectiontime: moment().format("YYYY-MM-DD hh:mm:ss")
 
@@ -369,8 +370,47 @@ exports.addWantList = (req, res) => {
                 })
             }
         } else {
-            res.cc(err, 402)
+            res.cc('商品不见了', 402)
         }
+    })
+}
+//删除收藏商品
+exports.deleteWantgoods=(req,res)=>{
+     //获取解析token
+    let usertoken = jwt.decode(req.headers.authorization.slice(7));
+  userModel.findOne({phone_id:usertoken.phone_id},{uwantlist:1}).then(docs=>{
+        if(docs)
+        {
+            // res.send({
+            //     status:200,
+            //     wantdata:docs.uwantlist
+            // })
+        
+      let index=  docs.uwantlist.findIndex(items=>{
+            return req.body.goods_id==items.goods_id
+        })
+        docs.uwantlist.splice(index,1)
+        docs.save(err=>{
+            if(!err)
+            {
+                    res.send({
+                status:200,
+             message:'删除收藏商品成功',
+             docs
+            })
+            }
+            else
+            {
+                res.cc('删除商品失败',301)
+            }
+        })
+
+         }
+        else{
+            res.cc('身份认证失败',301)
+        }
+    }).catch(err=>{
+        res.cc('删除失败',302)
     })
 }
 //回复商品

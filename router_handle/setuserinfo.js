@@ -4,11 +4,12 @@ const jwt = require('jsonwebtoken');
 const req = require('express/lib/request');
 //获取个人信息
 exports.getUserInfo = (req, res) => {
-    let usertoken = jwt.decode(req.headers.authorization.slice(7));
-    console.log(usertoken);
+    
+    let phone_id = req.query.phone_id?req.query.phone_id:jwt.decode(req.headers.authorization.slice(7)).phone_id;
+    
     userMoudule.findOne({
-        phone_id: usertoken.phone_id
-    }, '-_id -password -address').then(docs => {
+        phone_id
+    }, '-_id -password').then(docs => {
         if (docs) {
             res.send({
                 status: 200,
@@ -61,19 +62,28 @@ exports.updateInfo = (req, res) => {
 exports.updatePassword = (req, res) => {
     let usertoken = jwt.decode(req.headers.authorization.slice(7));
     userMoudule.findOne({
-        phone_id: usertoken.phone_id
-    }, {
-        password: 1
-    }).then(docs => {
-        docs.password = bcrypt.hashSync(req.body.password, 10)
-        docs.save(err => {
-            if (err) {
-                res.cc('修改密码失败', 301)
-            } else {
-                res.cc('修改密码成功', 200)
+        phone_id:usertoken.phone_id
+    },{}).then(docs => {
+            if (docs) {
+                const compareResult = bcrypt.compareSync(req.body.oldpassword, docs.password)
+                if (compareResult) {
+                    docs.password = bcrypt.hashSync(req.body.password, 10)
+                    docs.save(err => {
+                        if (err) {
+                            res.cc('修改密码失败' + err, 301)
+                        } else {
+                            res.cc('修改密码成功', 200)
+                        }
+                    })
+                } else {
+                    res.cc('原密码错误', 301)
+                }
             }
-        })
+         else {
+            res.cc('身份认证失败', 301)
+        }
+
     }).catch(err => {
-        res.cc('修改密码失败' + null, 301)
-    })
+    res.cc('修改密码失败' + err, 301)
+})
 }

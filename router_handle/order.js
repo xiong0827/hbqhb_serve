@@ -14,7 +14,7 @@ exports.createOrder = (req, res) => {
     goodsModel.findOne({
         goods_id: req.query.goods_id
     }, {}, (err, docs) => {
-        if (!err) {
+        if (docs) {
             if (docs.gstatus) {
                 orderModel.create({
                     order_id: uuid,
@@ -48,8 +48,13 @@ exports.createOrder = (req, res) => {
             } else {
                 res.cc('生成订单错误', 301)
             }
-        } else {
-            res.cc('生成订单异常' + err, 300)
+        }
+        else if(err)
+        {
+                res.cc('生成订单异常' + err, 300)
+        }
+        else {
+           res.cc('商品不见了',402)
         }
     })
 }
