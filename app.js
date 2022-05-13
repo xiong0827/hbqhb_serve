@@ -15,6 +15,7 @@ app.use(express.urlencoded({
     extended: false
 }))
 app.use('/uploads',express.static('./uploads'))
+app.use('/views',express.static('./views'))
 //一定要在路由之前封装一个res.cc函数
 app.use((req, res, next) => {
     res.cc = function (err,status=1) {
@@ -31,6 +32,7 @@ app.use(expressJWT({
     secret: config.jwtSecretKey
 }).unless({
     path: [/^\/api\//,
+    /^\/views\//,
     '/commodity/getgoodslist',
         '/commodity/getclass',{
         url:/^\/uploads\//,
@@ -57,7 +59,7 @@ app.use((err, req, res, next) => {
     }
     // 捕获身份认证失败的错误
     if (err.name === 'UnauthorizedError') {
-        return res.cc('身份认证失败，请登录')
+        return res.cc('身份认证失败，请登录',406)
     }
     res.cc(err)
 })

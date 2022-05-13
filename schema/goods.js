@@ -6,7 +6,7 @@ const title = joi.string().required().min(5).max(30)
 //商品分类
 const gclassone = joi.string().required().min(2).max(8).trim()
 //商品价格
-const gprice = joi.number().required().min(1).max(9999)
+const gprice = joi.number().required().min(0.1).max(99999)
 //商品图片
 const photo = joi.array().min(1)
 //插入商品

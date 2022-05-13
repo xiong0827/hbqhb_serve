@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "node app.js"
+    "serve": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +23,8 @@
     "mongoose": "^6.3.2",
     "multer": "^1.4.4",
     "nanoid": "^3.3.4",
+    "nginx": "^1.0.7",
+    "nodemon": "^2.0.16",
     "qcloudsms_js": "^0.1.1",
     "uuid": "^8.3.2"
   }

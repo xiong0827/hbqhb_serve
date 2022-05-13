@@ -23,6 +23,8 @@ exports.createOrder = (req, res) => {
                         details: docs.details,
                         gprice: docs.gprice,
                         title: docs.title,
+                        gphoto:docs.goodsphoto[0],
+                        
                     },
                     issueper: docs.issueper,
                     buserinfo: iusertoken,
@@ -37,7 +39,8 @@ exports.createOrder = (req, res) => {
                         res.send({
                             status: 200,
                             message: '生成订单成功',
-                            doc
+                            order_id:doc.order_id
+                           
                         })
                     } else {
                         res.cc('生成订单错误', 301)
@@ -86,14 +89,14 @@ exports.updateOrder = (req, res) => {
         if (err) {
             res.cc('获取订单失败' + null, 301)
         } else if (docs) {
-            docs.orderstatus = 1
+            docs.orderstatus = 2
             docs.save((err) => {
                 if (err) {
                     res.cc('修改订单状态失败' + err, 301)
                 } else {
                     res.send({
                         status: 200,
-                        message: '提交订单成功',
+                        message: '支付成功',
                         orderstatus: docs.orderstatus
                     })
                 }
@@ -113,7 +116,7 @@ exports.cancelOrder = (req, res) => {
             res.cc('获取订单失败' + null, 301)
         } else if (docs) {
             
-            docs.orderstatus = -1
+            docs.orderstatus = 3
             docs.save((err) => {
                 if (err) {
                     res.cc('取消订单失败' + err, 301)
@@ -147,6 +150,76 @@ exports.cancelOrder = (req, res) => {
 
         } else {
             res.cc('获取订单失败', 302)
+        }
+    })
+}
+//删除订单
+exports.deleteOrder = (req, res) => {
+    const order_id = req.query.order_id
+    orderModel.findOne({
+        order_id
+    }, {}).then(docs => {
+        if (docs) {
+            if (docs.orderstatus == 3 && docs.orderstatus == 2) {
+
+                orderModel.deleteOne({
+                    order_id: docs.order_id
+                }, err => {
+                    if (err) {
+                        res.cc('删除订单失败' + err, 401)
+                    } else {
+                        res.send({
+                            status: 200,
+                            message: '删除订单成功',
+                        })
+                    }
+                })
+                // docs.save(err => {
+                //     if (err) {
+                //         res.cc('删除订单失败' + err, 401)
+                //     } else {
+                //         res.send({
+                //             status: 200,
+                //             message: '删除订单成功',
+                //         })
+                //     }
+                // })
+            } else {
+                res.send({
+                    status: 302,
+                    message: '当前状态无法删除',
+                    orderstatus: docs.orderstatus
+                })
+            }
+        } else {
+            res.cc('订单不见了哦', 400)
+        }
+    }).catch(err => {
+        if (err) {
+            res.cc('删除订单失败' + err, 401)
+        }
+    })
+}
+//获取订单详情
+exports.getOrderInfo=(req,res)=>{
+    let usertoken = jwt.decode(req.headers.authorization.slice(7));
+    let orderinfo=req.query;
+    orderModel.findOne({order_id:orderinfo.order_id},{},(err,docs)=>{
+        if (err) {
+            res.cc('获取订单详情失败'+err,301)
+        }
+        else if(docs)
+        {
+            if (docs.buserinfo.phone_id==usertoken.phone_id) {
+                res.send({
+                    status:200,
+                    message:'获取订单详情成功',
+                    orderinfo:docs
+                })
+            }
+        }
+        else{
+            res.cc('没找到该订单'+err,301)
         }
     })
 }

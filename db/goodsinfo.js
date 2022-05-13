@@ -30,8 +30,8 @@ const goodsSchema = new Schema({
     },
     gprice: {
         type: Number,
-        min: 1,
-        max: 999,
+        min: 0.1,
+        max: 99999,
 
     },
     issueper:{

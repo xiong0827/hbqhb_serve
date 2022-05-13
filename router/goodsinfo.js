@@ -15,7 +15,7 @@ router.post('/issuegoods', fileUpload.array('photo'),expressjoi(reg_insertgoods_
 //获取分类
 router.get('/getclass',goods_handle.getclassList)
 //获取商品列表
-router.get('/getgoodslist',expressjoi(reg_showgoods_schema),goods_handle.getgoodsLits)
+router.post('/getgoodslist',expressjoi(reg_showgoods_schema),goods_handle.getgoodsLits)
 //获取个人发布的商品列表
 router.get('/getmaingoodslist',goods_handle.getMainGoodsList)
 //点赞商品
@@ -26,4 +26,6 @@ router.get('/getgoodsinfo',expressjoi(reg_goodsid_schema),goods_handle.getGoodsI
 router.post('/addwantlist',expressjoi(reg_goodsid_schema),goods_handle.addWantList)
 //商品留言
 router.post('/replygoods',expressjoi(reg_goodsid_schema),goods_handle.replyGoods)
+//删除收藏 
+router.post('/deletewantgoods',goods_handle.deleteWantgoods)
 module.exports = router

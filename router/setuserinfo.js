@@ -10,5 +10,5 @@ reg_updatepassword_schema
 const expressjoi = require('@escook/express-joi')
 router.get('/getuserinfo',setuser_handler.getUserInfo)
 router.post('/updateinfo',fileUpload.single('avatarurl'),expressjoi(reg_updateuserinfo_schema),setuser_handler.updateInfo)
-router.get('/updatepassword',expressjoi(reg_updatepassword_schema),setuser_handler.updatePassword)
+router.post('/updatepassword',expressjoi(reg_updatepassword_schema),setuser_handler.updatePassword)
 module.exports=router

@@ -28,7 +28,8 @@ exports.reg_userinfo_schema = {
     //修改密码
 exports.reg_updatepassword_schema={
     body:{
-        password
+        password,
+        oldpassword:password
     }
 }
 //修改个人信息
