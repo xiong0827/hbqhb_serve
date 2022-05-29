@@ -2,6 +2,7 @@ let userMoudule = require('../db/usersinfo')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
 const req = require('express/lib/request');
+const config=require('../config')
 //获取个人信息
 exports.getUserInfo = (req, res) => {
     
@@ -20,12 +21,11 @@ exports.getUserInfo = (req, res) => {
             res.cc('获取信息失败', 301)
         }
     }).catch(err => {
-        res.cc('获取个人信息失败' + null, 402)
+        res.cc('获取个人信息失败' + err, 402)
     })
 }
 //修改个人信息
 exports.updateInfo = (req, res) => {
-    let avatarurl = 'http://101.43.12.130:3000/' + req.file.path.replace(/\\/g, '/')
     let usertoken = jwt.decode(req.headers.authorization.slice(7));
     let userinfo = req.body
     userMoudule.findOne({
@@ -40,15 +40,36 @@ exports.updateInfo = (req, res) => {
         if (userinfo.address) {
             docs.address = userinfo.address
         }
-        if (req.file) {
-            docs.avatarurl = avatarurl
-        }
         if (userinfo.birthday) {
             docs.birthday = userinfo.birthday
         }
         docs.save((err) => {
             if (err) {
                 res.cc('保存失败', 301)
+            } else {
+                res.send({
+                    status: 200,
+                    messgae:'保存成功',
+                })
+            }
+        })
+    })
+}
+exports.updateUserAvatar=(req,res)=>{
+    let avatarurl = config.serverIp+'/' + req.file.path.replace(/\\/g, '/')
+    let usertoken = jwt.decode(req.headers.authorization.slice(7));
+    userMoudule.findOne({
+        phone_id: usertoken.phone_id
+    }, {}).then(docs => {
+        if (req.file) {
+            docs.avatarurl = avatarurl
+        }
+        else{
+            res.cc('修改头像失败',301)
+        }
+        docs.save((err) => {
+            if (err) {
+                res.cc('修改头失败像', 301)
             } else {
                 res.send({
                     status: 200,

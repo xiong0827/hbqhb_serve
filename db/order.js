@@ -15,7 +15,7 @@ goodsinfo:{
 }
 ,
 ordertime:{
-    type: Date,
+    type: String,
     default: moment().format('lll')
 },
 orderstatus:{
@@ -26,7 +26,7 @@ orderstatus:{
 },
 bphone_id:{
     type:String,
-       required: () => {
+      required: () => {
             return this.length != 0
         },
         //去除空格

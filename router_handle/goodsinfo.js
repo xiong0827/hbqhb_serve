@@ -474,4 +474,40 @@ exports.replyGoods = (req, res) => {
         }
     })
 }
-
+//下架商品
+exports.soldGoods=async (req,res)=>{
+    let goods_id=req.body.goods_id
+ await goodsModel.findOne({goods_id},{gstatus:1}).then((docs)=>{
+      if (docs==1) {
+          docs.gstatus=0
+          docs.save().then(err=>{
+              if (err) {
+                  res.cc('商品下架失败'+err,301)
+              }
+              else
+              {
+                  res.cc('商品下架成功',200)
+              }
+              
+          })
+      }
+          else if (docs==0) {
+          docs.gstatus=1
+          docs.save().then(err=>{
+              if (err) {
+                  res.cc('商品上架失败'+err,301)
+              }
+              else
+              {
+                  res.cc('商品上架成功',200)
+              }
+              
+          })
+      }
+      else{
+         res.cc('没有找到改商品',201)
+      }
+  },(err)=>{
+      res.cc('操作商品失败'+err,302)
+  })
+}

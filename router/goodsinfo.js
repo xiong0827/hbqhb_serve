@@ -28,4 +28,6 @@ router.post('/addwantlist',expressjoi(reg_goodsid_schema),goods_handle.addWantLi
 router.post('/replygoods',expressjoi(reg_goodsid_schema),goods_handle.replyGoods)
 //删除收藏 
 router.post('/deletewantgoods',goods_handle.deleteWantgoods)
+//下架商品 
+router.post('/soldgoods',goods_handle.soldGoods)
 module.exports = router

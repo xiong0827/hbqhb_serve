@@ -1,6 +1,7 @@
 require('./mongooseServer')
 const mongoose = require('mongoose')
 const moment = require('moment');
+moment.locale();
 var Schema = mongoose.Schema;
 const stuSchema = new Schema({
     phone_id: {
@@ -23,7 +24,7 @@ const stuSchema = new Schema({
     password: {
         type: String,
         trim: true,
-
+          
     },
     Introduction: String,
     nickname: {
@@ -52,11 +53,11 @@ const stuSchema = new Schema({
     },
 
     birthday: {
-        type: Date,
+        type: String,
         default: moment().format("YYYY-MM-DD")
     },
     udate: {
-        type: Date,
+        type: String,
         default: moment().format("YYYY-MM-DD hh:mm:ss")
     },
     addresslist:{

@@ -19,7 +19,7 @@ const multer = require('multer')
     // cb回调函数
     const tmp=path.extname(file.originalname)
     // cb(null,`随便.png`)
-    cb(null,`avatar_${new Date().getTime()}-${Math.floor(Math.random()*100).toString()}${tmp}`)
+    cb(null,`${file.fieldname}_${new Date().getTime()}-${Math.floor(Math.random()*100).toString()}${tmp}`)
     }
 })
 const fileUpload=multer({storage})

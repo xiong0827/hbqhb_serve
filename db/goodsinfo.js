@@ -51,7 +51,7 @@ const goodsSchema = new Schema({
        match:/^(13[0-9]|14[5|7]|19[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9]|16[0|1|2|3|5|6|7|8|9]|19[0|1|2|3|5|6|7|8|9])\d{8}$/
     },
     gdate: {
-        type: Date,
+        type: String,
         default: moment().format("YYYY-MM-DD hh:mm:ss")
     },
     greply: {

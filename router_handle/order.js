@@ -24,8 +24,8 @@ exports.createOrder = (req, res) => {
                         gprice: docs.gprice,
                         title: docs.title,
                         gphoto:docs.goodsphoto[0],
-                        
                     },
+                    bphone_id:iusertoken.phone_id,
                     issueper: docs.issueper,
                     buserinfo: iusertoken,
                 }, (err, doc) => {
@@ -65,7 +65,7 @@ exports.createOrder = (req, res) => {
 exports.getMainOrder = (req, res) => {
     let iusertoken = jwt.decode(req.headers.authorization.slice(7));
     orderModel.find({
-        buserinfo: iusertoken
+       bphone_id:iusertoken.phone_id,
     }, {}, (err, docs) => {
         if (!err) {
             if (docs) {
@@ -160,7 +160,7 @@ exports.deleteOrder = (req, res) => {
         order_id
     }, {}).then(docs => {
         if (docs) {
-            if (docs.orderstatus == 3 && docs.orderstatus == 2) {
+            if (docs.orderstatus == 3 || docs.orderstatus == 2) {
 
                 orderModel.deleteOne({
                     order_id: docs.order_id
