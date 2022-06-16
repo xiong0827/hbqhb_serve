@@ -83,28 +83,37 @@ exports.updateUserAvatar=(req,res)=>{
 exports.updatePassword = (req, res) => {
     let usertoken = jwt.decode(req.headers.authorization.slice(7));
     userMoudule.findOne({
-        phone_id:usertoken.phone_id
-    },{}).then(docs => {
+            phone_id: usertoken.phone_id
+        }, {})
+        .then(docs => {
             if (docs) {
                 const compareResult = bcrypt.compareSync(req.body.oldpassword, docs.password)
-                if (compareResult) {
-                    docs.password = bcrypt.hashSync(req.body.password, 10)
-                    docs.save(err => {
-                        if (err) {
-                            res.cc('修改密码失败' + err, 301)
-                        } else {
-                            res.cc('修改密码成功', 200)
-                        }
-                    })
-                } else {
-                    res.cc('原密码错误', 301)
+                return {
+                    docs,
+                    compareResult
                 }
+            } else {
+                return Promise.reject(new Error('身份认证失败'))
             }
-         else {
-            res.cc('身份认证失败', 301)
-        }
-
-    }).catch(err => {
-    res.cc('修改密码失败' + err, 301)
-})
+        }).then(data => {
+            if (!data.compareResult) {
+                throw new Error('原密码错误')
+            } else if (req.body.oldpassword === req.body.password) {
+                throw new Error('新旧密码不可相同')
+            } else {
+                return data
+            }
+        }).then(data => {
+            data.docs.password = bcrypt.hashSync(req.body.password, 10)
+            data.docs.save(err => {
+                if (err) {
+                    throw new Error('修改密码失败')
+                } else {
+                    res.cc('修改密码成功', 200)
+                }
+            })
+        })
+        .catch(err => {
+            res.cc(err, 301)
+        })
 }

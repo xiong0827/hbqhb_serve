@@ -53,7 +53,6 @@ const orderRouter=require('./router/order')
 app.use('/order',orderRouter)
 //错误中间件
 app.use((err, req, res, next) => {
-    console.log(err.name);
     if (err instanceof joi.ValidationError) {
         return res.cc(err)
     }

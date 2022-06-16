@@ -52,7 +52,7 @@ const goodsSchema = new Schema({
     },
     gdate: {
         type: String,
-        default: moment().format("YYYY-MM-DD hh:mm:ss")
+        default: moment().format("YYYY-MM-DD")
     },
     greply: {
         type: Array,

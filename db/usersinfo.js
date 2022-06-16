@@ -1,7 +1,6 @@
 require('./mongooseServer')
 const mongoose = require('mongoose')
 const moment = require('moment');
-moment.locale();
 var Schema = mongoose.Schema;
 const stuSchema = new Schema({
     phone_id: {
